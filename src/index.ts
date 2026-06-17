@@ -16,6 +16,7 @@ import { PriceController } from './controllers/price.controller';
 import { BlockchainController } from './controllers/blockchain.controller';
 import { createRouter } from './routes';
 import { schedule, clearAllSchedulers } from './utils/scheduler';
+import { swaggerDocument } from './utils/swagger';
 import logger from './utils/logger';
 
 const PORT = process.env['PORT'] ?? 3000;
@@ -47,7 +48,7 @@ const router = createRouter(
   priceController,
   blockchainController,
 );
-const app = createApp(router);
+const app = createApp(router, swaggerDocument);
 
 schedule('price-sync', SYNC_INTERVAL_MS, () => syncService.syncPrices());
 
