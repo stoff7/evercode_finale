@@ -2,9 +2,11 @@ import { Router } from 'express';
 import { CurrencyController } from '../controllers/currency.controller';
 import { WalletController } from '../controllers/wallet.controller';
 import { PriceController } from '../controllers/price.controller';
+import { BlockchainController } from '../controllers/blockchain.controller';
 import { createCurrencyRouter } from './currency.router';
 import { createWalletRouter } from './wallet.router';
 import { createPriceRouter } from './price.router';
+import { createBlockchainRouter } from './blockchain.router';
 import { createAuthMiddleware } from '../middlewares/auth.middleware';
 import { ApiKeyRepository } from '../repositories/apiKey.repository';
 import logger from '../utils/logger';
@@ -14,6 +16,7 @@ export function createRouter(
   currencyController: CurrencyController,
   walletController: WalletController,
   priceController: PriceController,
+  blockchainController: BlockchainController,
 ): Router {
   const router = Router();
   const auth = createAuthMiddleware(apiKeyRepository);
@@ -26,6 +29,9 @@ export function createRouter(
   router.use('/currencies', auth, createCurrencyRouter(currencyController));
   router.use('/wallets', auth, createWalletRouter(walletController));
   router.use('/prices', auth, createPriceRouter(priceController));
+  router.use('/blockchain', auth, createBlockchainRouter(blockchainController));
+
+  router.get('/wallets/:id/balance', auth, blockchainController.getWalletBalance);
 
   return router;
 }
