@@ -1,15 +1,25 @@
 import { createApp } from './app';
+import { createDatabase } from './db/database';
+import { ApiKeyRepository } from './repositories/apiKey.repository';
+import { CurrencyRepository } from './repositories/currency.repository';
+import { CurrencyService } from './services/currency.service';
+import { CurrencyController } from './controllers/currency.controller';
+import { createRouter } from './routes';
 import { clearAllSchedulers } from './utils/scheduler';
 import logger from './utils/logger';
-import express from 'express';
 
 const PORT = process.env['PORT'] ?? 3000;
 
-const router = express.Router();
-router.get('/status', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
+const db = createDatabase();
 
+const apiKeyRepository = new ApiKeyRepository(db);
+const currencyRepository = new CurrencyRepository(db);
+
+const currencyService = new CurrencyService(currencyRepository);
+
+const currencyController = new CurrencyController(currencyService);
+
+const router = createRouter(apiKeyRepository, currencyController);
 const app = createApp(router);
 
 const server = app.listen(PORT, () => {
